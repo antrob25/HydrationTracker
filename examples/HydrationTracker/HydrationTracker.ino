@@ -1,7 +1,13 @@
 #include "HX711.h"
+#include "BluetoothSerial.h"
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
 
 #define calibration_factor -7050.0
 
+BluetoothSerial SerialBT;
 // HX711 circuit wiring
 const int LOADCELL_DOUT_PIN = 2;
 const int LOADCELL_SCK_PIN = 3;
@@ -12,7 +18,9 @@ float batVoltage = 0;
 
 void setup() 
 {
-    Serial.begin(9600);
+    Serial.begin(115200);
+    SerialBT.begin("ESP32test"); //Bluetooth device name
+    Serial.println("The device started, now you can pair it with bluetooth!");
     scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
     scale.set_scale(calibration_factor);
     pinMode(A13, INPUT);
@@ -20,6 +28,23 @@ void setup()
 
 void loop() 
 {
+    if (Serial.available()) 
+    {
+        while (Serial.available())
+        {
+            SerialBT.write(Serial.read());
+        }    
+    }
+    if (SerialBT.available()) 
+    {
+        while (SerialBT.available())
+        {
+            Serial.write(SerialBT.read());
+
+        }
+    }
+    delay(100);
+
     if (scale.is_ready())
     {
         long reading = scale.read();
