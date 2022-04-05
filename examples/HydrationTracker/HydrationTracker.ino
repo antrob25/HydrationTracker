@@ -5,12 +5,12 @@
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
 #endif
 
-#define calibration_factor -7050.0
+#define calibration_factor -218
 
 BluetoothSerial SerialBT;
 // HX711 circuit wiring
-const int LOADCELL_DOUT_PIN = 2;
-const int LOADCELL_SCK_PIN = 3;
+const int LOADCELL_DOUT_PIN = 23;
+const int LOADCELL_SCK_PIN = 22;
 
 HX711 scale;
 
@@ -23,6 +23,7 @@ void setup()
     Serial.println("The device started, now you can pair it with bluetooth!");
     scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
     scale.set_scale(calibration_factor);
+    scale.tare();
     pinMode(A13, INPUT);
 }
 
@@ -47,8 +48,8 @@ void loop()
 
     if (scale.is_ready())
     {
-        long reading = scale.read();
-        Serial.print("HX711 reading: ");
+        long reading = scale.get_units(10);
+        Serial.print("HX711 reading (g): ");
         Serial.println(reading);
     } 
     else 
