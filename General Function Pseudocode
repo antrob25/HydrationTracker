@@ -1,0 +1,28 @@
+### SETUP ###
+  current_weight = 0
+
+
+### LOOP ###
+
+ ### Weight Change Details ###
+ new_weight = record_weight
+ 
+ IF current_weight > new_weight - tolerance THEN
+    # record change in weight
+    # set current weight = new_weight
+    
+ ELIF current_weight < new_weight + tolerance THEN
+    # set current weight = new_weight
+    
+ 
+ ### Convert Weight ###
+ take recorded change in weight and convert to ounces of water
+ 
+ ### Send oz to computer or app ###
+ send data over bluetooth
+ 
+ 
+ 
+ 
+ 
+
