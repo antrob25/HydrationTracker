@@ -50,8 +50,10 @@ void loop()
           {
             long delta = previous_reading - reading;
             previous_reading = reading;
-            Serial.print("HX711 delta (g): ");
+            Serial.println("HX711 delta (g): ");
+            //BT_print();
             Serial.println(delta);
+            //BT_print();
           }
         }
     } 
@@ -66,6 +68,16 @@ void loop()
     //Serial.println(batVoltage);
 
     Serial.println("Not Reading");
+    BT_print(100);
     delay(3000);
 
+}
+
+void BT_print(int val)
+{
+  char arr[100];
+  sprintf(arr, "%d\r\n", val);
+  
+  SerialBT.write((uint8_t*)arr, sizeof(val)+1);
+    
 }
