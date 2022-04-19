@@ -37,47 +37,93 @@ void loop()
         
         if (reading > 100)
         {
-          Serial.println("Reading Set...");
+          BT_print("Reading Set...");
           delay(2000);
         
           if (reading > previous_reading + 12) 
           {
             previous_reading = reading;
-            Serial.print("HX711 reading (g): ");
-            Serial.println(reading);  
+            BT_print("HX711 reading (g): ");
+            BT_print((uint16_t)reading);  
           }
           else if (reading < previous_reading - 12)
           {
             long delta = previous_reading - reading;
             previous_reading = reading;
-            Serial.println("HX711 delta (g): ");
-            //BT_print();
-            Serial.println(delta);
-            //BT_print();
+            BT_print("HX711 delta (g): ");
+            BT_print((uint16_t)delta);
           }
         }
     } 
     else 
     {
-        Serial.println("HX711 not found.");
+        BT_print("HX711 not found.");
+        BT_printNewline();
     }
 
-    //batVoltage = analogRead(A13);
-    //batVoltage = (batVoltage*(3.7/4095.0))*2.0;
-    //Serial.println("Battery Voltage (V):");
-    //Serial.println(batVoltage);
-
-    Serial.println("Not Reading");
-    BT_print(100);
-    delay(3000);
+    batVoltage = analogRead(A13);
+    batVoltage = (batVoltage*(3.7/4095.0))*2.0;
+    BT_print("Battery Voltage (V):  ");
+    BT_print((uint8_t)batVoltage);
+    BT_printNewline();
+    BT_print("Not Reading ");
+    BT_printNewline();
+    delay(1500);
 
 }
 
-void BT_print(int val)
+void BT_print(uint8_t val)
 {
   char arr[100];
-  sprintf(arr, "%d\r\n", val);
-  
-  SerialBT.write((uint8_t*)arr, sizeof(val)+1);
-    
+  sprintf(arr, "%d", val);
+  SerialBT.write((uint8_t)arr[0]);
+  if ( val >= 10 )
+  {
+    SerialBT.write((uint8_t)arr[1]);
+  }
+  if ( val > 100)
+  {
+    SerialBT.write((uint8_t)arr[2]);
+  }
+}
+
+void BT_print(uint16_t val)
+{
+  char arr[100];
+  sprintf(arr, "%d", val);
+  SerialBT.write((uint8_t)arr[0]);
+  if ( val >= 10 )
+  {
+    SerialBT.write((uint8_t)arr[1]);
+  }
+  if ( val > 100)
+  {
+    SerialBT.write((uint8_t)arr[2]);
+  }
+  if ( val > 255 )
+  {
+    SerialBT.write((uint8_t)arr[3]);
+  }  
+  if ( val >= 1000 )
+  {
+    SerialBT.write((uint8_t)arr[4]);
+  }
+  if ( val > 10000)
+  {
+    SerialBT.write((uint8_t)arr[5]);
+  }
+}
+
+void BT_print(String s)
+{
+  uint8_t len = s.length();
+  unsigned char word[len];
+  s.getBytes(word, len);
+  SerialBT.write((uint8_t*)word, len);
+}
+
+void BT_printNewline()
+{
+  char arr[2] = {'\r', '\n'};
+  SerialBT.write((uint8_t*)arr, sizeof(arr));
 }
