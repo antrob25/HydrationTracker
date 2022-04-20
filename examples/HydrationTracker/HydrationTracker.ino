@@ -15,6 +15,8 @@ const int LOADCELL_SCK_PIN = 22;
 HX711 scale;
 long previous_reading = 0;
 
+uint32_t totalWaterDrank = 0;
+
 float batVoltage = 0;
 
 void setup() 
@@ -33,25 +35,32 @@ void loop()
 
     if (scale.is_ready())
     {
-        long reading = scale.get_units(100);
+        long reading = scale.get_units(20);
         
         if (reading > 100)
         {
-          BT_print("Reading Set...");
+          BT_print("Reading Set... ");
+          BT_printNewline();
           delay(2000);
         
-          if (reading > previous_reading + 12) 
+          if (reading > previous_reading + 6) 
           {
             previous_reading = reading;
-            BT_print("HX711 reading (g): ");
-            BT_print((uint16_t)reading);  
+            BT_print("HX711 reading (ml):  ");
+            BT_print((uint16_t)reading);
+            BT_printNewline();
           }
-          else if (reading < previous_reading - 12)
+          else if (reading < previous_reading - 6)
           {
             long delta = previous_reading - reading;
+            totalWaterDrank += delta;
             previous_reading = reading;
-            BT_print("HX711 delta (g): ");
+            BT_print("HX711 delta (ml):  ");
             BT_print((uint16_t)delta);
+            BT_printNewline();
+            BT_print("Total Water Drank (ml):  ");
+            BT_print((uint16_t)totalWaterDrank);
+            BT_printNewline();
           }
         }
     } 
@@ -68,7 +77,7 @@ void loop()
     BT_printNewline();
     BT_print("Not Reading ");
     BT_printNewline();
-    delay(1500);
+    delay(3000);
 
 }
 
